@@ -32,7 +32,7 @@ class StockProApi {
             }
         }
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, _) = try await URLSession.shared.data(for: request)
         
         // Handle errors
         
