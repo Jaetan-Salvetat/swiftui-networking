@@ -7,7 +7,7 @@
 
 import Foundation
 
-class TodoApi {
+class TodoApiImpl: TodoApi {
     static func getTodos() async throws -> [Todo] {
         return try await StockProApi.shared.makeRequest(
             url: URL(string: "https://jsonplaceholder.typicode.com/todos"),
