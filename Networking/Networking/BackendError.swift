@@ -7,15 +7,13 @@
 
 import Foundation
 
-enum BackendError: String, LocalizedError, CaseIterable {
-    case badRequest
+enum BackendError: String {
     case unknown
     
-    static func fromString(errorString: String) -> BackendError {
-        if let error = self.allCases.first(where: { $0.rawValue == errorString }) {
-            return error
+    var message: String {
+        switch self {
+        default:
+            return "Unknown"
         }
-        
-        return .unknown
     }
 }
