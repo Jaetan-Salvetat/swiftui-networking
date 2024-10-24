@@ -16,7 +16,7 @@ class StockProApi {
         body: Encodable? = nil
     ) async throws -> T {
         guard let requestUrl = url else {
-            throw BackendError.badRequest
+            throw AppError.badRequest
         }
         
         var request = URLRequest(url: requestUrl)
@@ -28,18 +28,37 @@ class StockProApi {
                 request.httpBody = try JSONEncoder().encode(requestBody)
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             } catch {
-                throw BackendError.badRequest
+                throw AppError.custom(message: error.localizedDescription)
             }
         }
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        // Handle errors
-        
         do {
-            return try JSONDecoder().decode(T.self, from: data)
+            var (data, response) = try await URLSession.shared.data(for: request)
+            let statusCode = (response as? HTTPURLResponse)?.statusCode
+            
+            // Unlog user
+            if statusCode == 401 || statusCode == 403 {
+                // TODO: Unlog user
+                throw AppError.logout
+            }
+            
+            let result = try JSONDecoder().decode(T.self, from: data)
+            
+            // if !result.success {
+            //     throw AppError.backend(message: result.message)
+            // }
+            
+            return result
         } catch {
-            throw BackendError(rawValue: "backend error") ?? .unknown
+            // Manage timout
+            if error._code == NSURLErrorTimedOut ||
+                error._code == NSURLErrorNetworkConnectionLost ||
+                error._code == NSURLErrorNotConnectedToInternet {
+                
+                throw AppError.timeout
+            } else {
+                throw AppError.custom(message: error.localizedDescription)
+            }
         }
     }
 }

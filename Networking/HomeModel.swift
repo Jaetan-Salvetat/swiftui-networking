@@ -14,7 +14,7 @@ class HomeModel {
     /// Get all todos
     func fetchTodos() async {
         do {
-            todos = try await TodoApi.getTodos()
+            todos = try await TodoApiImpl.getTodos()
         } catch {
             // handle error
         }
@@ -23,7 +23,7 @@ class HomeModel {
     /// Delete one todo
     func deleteTodo(todoId: Int) async {
         do {
-            try await TodoApi.deleteTodo(todoId: todoId)
+            try await TodoApiImpl.deleteTodo(todoId: todoId)
             todos.removeAll {
                 $0.id == todoId
             }
